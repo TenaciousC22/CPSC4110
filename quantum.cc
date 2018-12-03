@@ -9,6 +9,7 @@ struct complex{
 };
 
 complex zero,one;
+vector<complex> ketone,ketzero;
 
 void cnotinit();
 vector<complex> cnot(vector<complex>,vector<complex>);
@@ -29,18 +30,17 @@ int main()
 	complex x,y;
 	x.r=1;
 	x.i=1;
-	vector<complex> a,b;
-	b.push_back(zero);
-	b.push_back(one);
-	a.push_back(one);
-	a.push_back(zero);
-	cnot(a,a);
+	ketone.push_back(zero);
+	ketone.push_back(one);
+	ketzero.push_back(one);
+	ketzero.push_back(zero);
+	cnot(ketzero,ketzero);
 	cout<<endl;
-	cnot(a,b);
+	cnot(ketzero,ketone);
 	cout<<endl;
-	cnot(b,a);
+	cnot(ketone,ketzero);
 	cout<<endl;
-	cnot(b,b);
+	cnot(ketone,ketone);
 	return 0;
 }
 
@@ -126,7 +126,23 @@ vector<complex> cnot(vector<complex> x,vector<complex> y)
 		disp(ret[i]);
 		cout<<endl;
 	}
-	return ret;
+	if(decode==0){
+		x=ketzero;
+		y=ketzero;
+	}
+	else if(decode==1){
+		x=ketzero;
+		y=ketone;
+	}
+	else if(decode==2){
+		x=ketone;
+		y=ketzero;
+	}
+	else{
+		x=ketone;
+		y=ketone;
+	}
+	return y;
 }
 
 vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<complex> > y)
