@@ -8,6 +8,10 @@ struct complex{
 	double r,i;
 };
 
+complex zero,one;
+
+void cnotinit();
+vector<complex> cnot(vector<complex>,vector<complex>);
 complex sum(complex,complex);
 complex product(complex,complex);
 complex conjugate(complex);
@@ -16,18 +20,27 @@ vector<complex> tensor(vector<complex>,vector<complex>);
 double modulous(complex);
 void disp(complex);
 
+complex fourbyfour[4][4];
+complex eightbyeight[8][8];
+
 int main()
 {
+	cnotinit();
 	complex x,y;
 	x.r=1;
 	x.i=1;
-	y=sum(x,x);
-	disp(y);
-	y=product(x,x);
-	disp(y);
-	y=conjugate(x);
-	disp(y);
-	cout<<modulous(x)<<endl;
+	vector<complex> a,b;
+	b.push_back(zero);
+	b.push_back(one);
+	a.push_back(one);
+	a.push_back(zero);
+	cnot(a,a);
+	cout<<endl;
+	cnot(a,b);
+	cout<<endl;
+	cnot(b,a);
+	cout<<endl;
+	cnot(b,b);
 	return 0;
 }
 
@@ -36,11 +49,15 @@ void disp(complex x)
 {
 	if(x.i<0)
 	{
-		cout<<x.r<<x.i<<"i\n";
+		cout<<x.r<<x.i<<"i";
+	}
+	if(x.i==0)
+	{
+		cout<<x.r;
 	}
 	else
 	{
-		cout<<x.r<<"+"<<x.i<<"i\n";
+		cout<<x.r<<"+"<<x.i<<"i";
 	}
 }
 
@@ -85,6 +102,33 @@ double modulous(complex x)
 	return sqrt((pow(x.r,2)+pow(x.i,2)));
 }
 
+//returns affected ket vector
+vector<complex> cnot(vector<complex> x,vector<complex> y)
+{
+	int xoff,yoff,decode;
+	vector<complex> temp,ret;
+	for(int i=0;i<4;i++){
+		temp.push_back(zero);
+		ret.push_back(zero);
+	}
+	if(x[0].r==1){xoff=0;}
+	else{xoff=1;}
+	if(y[0].r==1){yoff=0;}
+	else{yoff=1;}
+	temp[(xoff*2)+yoff].r=1;
+	for(int i=0;i<4;i++)
+	{
+		ret[i]=sum(sum(product(fourbyfour[0][i],temp[0]),product(fourbyfour[1][i],temp[1])),sum(product(fourbyfour[2][i],temp[2]),product(fourbyfour[3][i],temp[3])));
+	}
+	for(int i=0;i<4;i++)
+	{
+		if(ret[i].r==1){decode=i;}
+		disp(ret[i]);
+		cout<<endl;
+	}
+	return ret;
+}
+
 vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<complex> > y)
 {
 	int i=0,j=0,k=0;
@@ -115,7 +159,7 @@ vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<comp
 	return thing;
 }
 
-//Function specifically made for ket tensors
+//Function specifically made for ket tensors********Currently doesn't work
 vector<complex> tensor(vector<complex> x,vector<complex> y)
 {
 	int i=0,j=0;
@@ -133,4 +177,35 @@ vector<complex> tensor(vector<complex> x,vector<complex> y)
 		}
 	}
 	return temp;
+}
+
+void cnotinit()
+{
+	zero.r=0;
+	zero.i=0;
+	one.r=1;
+	one.i=0;
+	int i,j;
+	for(i=0;i<4;i++)
+	{
+		for(j=0;j<4;j++)
+		{
+			fourbyfour[i][j]=zero;
+			if((i==1&&j==1)||(i==0&&j==0)||(i==2&&j==3)||(i==3&&j==2))
+			{
+				fourbyfour[i][j]=one;
+			}
+		}
+	}
+	for(i=0;i<8;i++)
+	{
+		for(j=0;j<8;j++)
+		{
+			eightbyeight[i][j]=zero;
+			if((i==1&&j==1)||(i==0&&j==0)||(i==2&&j==2)||(i==3&&j==3)||(i==4&&j==4)||(i==5&&j==5)||(i==6&&j==7)||(i==7&&j==6))
+			{
+				eightbyeight[i][j]=one;
+			}
+		}
+	}
 }
