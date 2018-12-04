@@ -29,7 +29,7 @@ int main()
 {
 	cnotinit();
 	complex x,y;
-	vector<complex> a,b;
+	vector<complex> a,b,test;
 	x.r=1;
 	x.i=1;
 	ketone.push_back(zero);
@@ -45,6 +45,7 @@ int main()
 	cnot(ketone,ketzero);
 	cout<<endl;
 	cnot(ketone,ketone);
+	cout<<endl;
 	toffoli(a,a,a);
 	cout<<endl;
 	toffoli(a,a,b);
@@ -128,9 +129,9 @@ vector<complex> cnot(vector<complex> x,vector<complex> y)
 	int xoff,yoff,decode;
 	vector<complex> temp,ret;
 	for(int i=0;i<4;i++){
-		temp.push_back(zero);
 		ret.push_back(zero);
 	}
+	temp=tensor(x,y);
 	if(x[0].r==1){xoff=0;}
 	else{xoff=1;}
 	if(y[0].r==1){yoff=0;}
@@ -152,7 +153,7 @@ vector<complex> cnot(vector<complex> x,vector<complex> y)
 	else if(decode==2){
 		y=ketzero;
 	}
-	return y;
+	return ret;
 }
 
 //returns the affected qubit
@@ -162,9 +163,10 @@ vector<complex> toffoli(vector<complex> x,vector<complex> y,vector<complex> z)
 	vector<complex> temp, ret;
 	for(int i=0;i<8;i++)
 	{
-		temp.push_back(zero);
 		ret.push_back(zero);
 	}
+	temp=tensor(x,y);
+	temp=tensor(temp,z);
 	if(x[0].r==1){xoff=0;}
 	else{xoff=1;}
 	if(y[0].r==1){yoff=0;}
@@ -189,7 +191,7 @@ vector<complex> toffoli(vector<complex> x,vector<complex> y,vector<complex> z)
 	else if(decode=7){
 		z=ketzero;
 	}
-	return z;
+	return ret;
 }
 
 vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<complex> > y)
@@ -226,17 +228,16 @@ vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<comp
 vector<complex> tensor(vector<complex> x,vector<complex> y)
 {
 	int i=0,j=0;
-	complex temp1;
 	vector<complex> temp;
-	for(i=0;i<x.size()*y.size();i++)
+	for(i=0;i<static_cast<int>(x.size())*static_cast<int>(y.size());i++)
 	{
-		temp.push_back(temp1);
+		temp.push_back(zero);
 	}
 	for(i=0;i<x.size();i++)
 	{
 		for(j=0;j<y.size();j++)
 		{
-			temp[i+j]=product(x[i],y[j]);
+			temp[(i*2)+j]=product(x[i],y[j]);
 		}
 	}
 	return temp;
