@@ -12,6 +12,7 @@ complex zero,one;
 vector<complex> ketone,ketzero;
 
 void cnotinit();
+vector<complex> toffoli(vector<complex>,vector<complex>,vector<complex>);
 vector<complex> cnot(vector<complex>,vector<complex>);
 complex sum(complex,complex);
 complex product(complex,complex);
@@ -28,12 +29,15 @@ int main()
 {
 	cnotinit();
 	complex x,y;
+	vector<complex> a,b;
 	x.r=1;
 	x.i=1;
 	ketone.push_back(zero);
 	ketone.push_back(one);
 	ketzero.push_back(one);
 	ketzero.push_back(zero);
+	a=ketzero;
+	b=ketone;
 	cnot(ketzero,ketzero);
 	cout<<endl;
 	cnot(ketzero,ketone);
@@ -41,6 +45,22 @@ int main()
 	cnot(ketone,ketzero);
 	cout<<endl;
 	cnot(ketone,ketone);
+	toffoli(a,a,a);
+	cout<<endl;
+	toffoli(a,a,b);
+	cout<<endl;
+	toffoli(a,b,a);
+	cout<<endl;
+	toffoli(a,b,b);
+	cout<<endl;
+	toffoli(b,a,a);
+	cout<<endl;
+	toffoli(b,a,b);
+	cout<<endl;
+	toffoli(b,b,a);
+	cout<<endl;
+	toffoli(b,b,b);
+	cout<<endl;
 	return 0;
 }
 
@@ -126,23 +146,50 @@ vector<complex> cnot(vector<complex> x,vector<complex> y)
 		disp(ret[i]);
 		cout<<endl;
 	}
-	if(decode==0){
-		x=ketzero;
-		y=ketzero;
-	}
-	else if(decode==1){
-		x=ketzero;
+	if(decode==3){
 		y=ketone;
 	}
 	else if(decode==2){
-		x=ketone;
 		y=ketzero;
 	}
-	else{
-		x=ketone;
-		y=ketone;
-	}
 	return y;
+}
+
+//returns the affected qubit
+vector<complex> toffoli(vector<complex> x,vector<complex> y,vector<complex> z)
+{
+	int xoff,yoff,zoff,decode;
+	vector<complex> temp, ret;
+	for(int i=0;i<8;i++)
+	{
+		temp.push_back(zero);
+		ret.push_back(zero);
+	}
+	if(x[0].r==1){xoff=0;}
+	else{xoff=1;}
+	if(y[0].r==1){yoff=0;}
+	else{yoff=1;}
+	if(z[0].r==1){zoff=0;}
+	else{zoff=1;}
+	temp[(xoff*4)+(yoff*2)+zoff]=one;
+	for(int i=0;i<8;i++)
+	{
+		//trust me, it works
+		ret[i]=sum(sum(sum(product(eightbyeight[0][i],temp[0]),product(eightbyeight[1][i],temp[1])),sum(product(eightbyeight[2][i],temp[2]),product(eightbyeight[3][i],temp[3]))),sum(sum(product(eightbyeight[4][i],temp[4]),product(eightbyeight[5][i],temp[5])),sum(product(eightbyeight[6][i],temp[6]),product(eightbyeight[7][i],temp[7]))));
+	}
+	for(int i=0;i<8;i++)
+	{
+		if(ret[i].r==1){decode=i;}
+		disp(ret[i]);
+		cout<<endl;
+	}
+	if(decode=8){
+		z=ketone;
+	}
+	else if(decode=7){
+		z=ketzero;
+	}
+	return z;
 }
 
 vector<vector<complex> > tensorgen(vector<vector<complex> > x,vector<vector<complex> > y)
