@@ -54,7 +54,9 @@ int main()
 		cout<<"1: CNOT"<<endl;
 		cout<<"2: Toffoli"<<endl;
 		cout<<"3: Deutsche's "<<endl;
-		cout<<"4: Exit\n";
+		cout<<"4: CNOT test\n";
+		cout<<"5: Toffoli test\n";
+		cout<<"6: Exit";
 		std::cin>>option;
 		cin.clear();
 		if (option==1){
@@ -87,7 +89,35 @@ int main()
 			cout<<endl;
 			deutsch();
 		}
-		else if(option!=4){
+		else if(option==4){
+			cnot(ketzero,ketzero);
+			cout<<endl;
+			cnot(ketzero,ketone);
+			cout<<endl;
+			cnot(ketone,ketzero);
+			cout<<endl;
+			cnot(ketone,ketone);
+			cout<<endl;
+		}
+		else if(option==5){
+			toffoli(a,a,a);
+			cout<<endl;
+			toffoli(a,a,b);
+			cout<<endl;
+			toffoli(a,b,a);
+			cout<<endl;
+			toffoli(a,b,b);
+			cout<<endl;
+			toffoli(b,a,a);
+			cout<<endl;
+			toffoli(b,a,b);
+			cout<<endl;
+			toffoli(b,b,a);
+			cout<<endl;
+			toffoli(b,b,b);
+			cout<<endl;
+		}
+		else if(option==6){
 			cout<<"Invalid Entry\n";
 		}
 	}
