@@ -41,39 +41,56 @@ int main()
 {
 	//initilize global variables and other useful stuff
 	init();
+	int option=20,n,m,o;
 	complex x,y;
 	vector<complex> a,b,test;
 	x.r=1;
 	x.i=1;
 	a=ketzero;
 	b=ketone;
-	/*
-	//This is just test stuff
-	cnot(ketzero,ketzero);
-	cout<<endl;
-	cnot(ketzero,ketone);
-	cout<<endl;
-	cnot(ketone,ketzero);
-	cout<<endl;
-	cnot(ketone,ketone);
-	cout<<endl;
-	toffoli(a,a,a);
-	cout<<endl;
-	toffoli(a,a,b);
-	cout<<endl;
-	toffoli(a,b,a);
-	cout<<endl;
-	toffoli(a,b,b);
-	cout<<endl;
-	toffoli(b,a,a);
-	cout<<endl;
-	toffoli(b,a,b);
-	cout<<endl;
-	toffoli(b,b,a);
-	cout<<endl;
-	toffoli(b,b,b);
-	cout<<endl;*/
-	deutsch();
+	while(option!=4)
+	{
+		cout<<"\nChoose an option:"<<endl;
+		cout<<"1: CNOT"<<endl;
+		cout<<"2: Toffoli"<<endl;
+		cout<<"3: Deutsche's "<<endl;
+		cout<<"4: Exit\n";
+		std::cin>>option;
+		cin.clear();
+		if (option==1){
+			cout<<"Enter your 2-bit binary input with a space after each"<<endl;
+			std::cin>>n>>m;
+			cout<<endl;
+			cin.clear();
+			if (n==0&&m==0){cnot(a,a);}
+			if (n==0&&m==1){cnot(a,b);}
+			if (n==1&&m==0){cnot(b,a);}
+			if (n==1&&m==1){cnot(b,b);}
+			cout<<endl;
+		}
+		else if (option==2){
+			cout<<"Enter your 3-bit binary input"<<endl;
+			std::cin>>n>>m>>o;
+			cout<<endl;
+			cin.clear();
+			if (n==0&&m==0&&o==0){toffoli(a,a,a);}
+			if (n==0&&m==0&&o==1){toffoli(a,a,b);}
+			if (n==0&&m==1&&o==0){toffoli(a,b,a);}
+			if (n==0&&m==1&&o==1){toffoli(a,b,b);}
+			if (n==1&&m==0&&o==0){toffoli(b,a,a);}
+			if (n==1&&m==0&&o==1){toffoli(b,a,b);}
+			if (n==1&&m==1&&o==0){toffoli(b,b,a);}
+			if (n==1&&m==1&&o==1){toffoli(b,b,b);}
+			cout<<endl;
+		}
+		else if (option==3){
+			cout<<endl;
+			deutsch();
+		}
+		else if(option!=4){
+			cout<<"Invalid Entry\n";
+		}
+	}
 	return 0;
 }
 
@@ -220,6 +237,7 @@ vector<complex> toffoli(vector<complex> x,vector<complex> y,vector<complex> z)
 //take a guess at what this does
 vector<complex> deutsch()
 {
+	//build Uf
 	complex uf[4][4];
 	for(int i=0;i<4;i++)
 	{
@@ -240,21 +258,27 @@ vector<complex> deutsch()
 		uf[2][i].r=c;
 		uf[3][i].r=d;
 	}
+	//set up kets and entangle then tensor them
 	top=ketzero;
 	bot=ketone;
 	top=hadamard(top);
 	bot=hadamard(bot);
 	temp=tensor(top,bot);
+	//matrix multiplication
 	for(int i=0;i<4;i++)
 	{
-		ret.push_back(sum(sum(product(fourbyfour[0][i],temp[0]),product(fourbyfour[1][i],temp[1])),sum(product(fourbyfour[2][i],temp[2]),product(fourbyfour[3][i],temp[3]))));
+		ret.push_back(sum(sum(product(uf[0][i],temp[0]),product(uf[1][i],temp[1])),sum(product(uf[2][i],temp[2]),product(uf[3][i],temp[3]))));
 	}
-	ret=hadamard(ret);
-	for(int i=0;i<4;i++)
+	//output results
+	if(ret[1].r<0&&ret[3].r<0)
 	{
-		disp(ret[i]);
-		cout<<endl;
+		cout<<"Uf is constant\n";
 	}
+	else
+	{
+		cout<<"Uf is balanced\n";
+	}
+	//tbh not sure why I do this, but it can't hurt
 	return ret;
 }
 
@@ -365,24 +389,44 @@ void init()
 	}
 }
 
+//Function to entangle a ket
 vector<complex> hadamard(vector<complex> x)
 {
+	//build the return vector
 	vector<complex> ret;
 	for(int i=0;i<2;i++)
 	{
 		ret.push_back(zero);
 	}
+	//matrix multiplication and root 2ing
 	for(int i=0;i<2;i++)
 	{
 		ret[i]=sum(product(hada[0][i],x[0]),product(hada[1][i],x[1]));
+		ret[i]=coproduct(ret[i],1/sqrt(2));
 	}
-	ret[0]=coproduct(ret[0],1/sqrt(2));
-	ret[1]=coproduct(ret[1],1/sqrt(2));
+	//return the new thing
 	return ret;
 }
 
+
+//I'm so tired I've resorted to condom jokes
 vector<complex> hadamardMagnum(vector<complex> x)
 {
+	//build the 4 by 4 hadamard matrix
 	complex neg=coproduct(one,-1);
-	complex hadamardXL[4][4]
+	vector<complex> ret;
+	complex hadamardXL[4][4]={
+		{one,one,one,one},
+		{one,neg,one,neg},
+		{one,one,neg,neg},
+		{one,neg,neg,one}
+	};
+	//matrix multiplication and root 2ing
+	for(int i=0;i<4;i++)
+	{
+		ret.push_back(sum(sum(product(hadamardXL[0][i],x[0]),product(hadamardXL[1][i],x[1])),sum(product(hadamardXL[2][i],x[2]),product(hadamardXL[3][i],x[3]))));
+		ret[i]=coproduct(ret[i],1/sqrt(2));
+	}
+	//return the new thing
+	return ret;
 }
